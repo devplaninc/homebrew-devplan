@@ -25,12 +25,12 @@ class Devplan < Formula
       Auto-update is disabled in this Homebrew build.
 
       To update devplan, use Homebrew:
-        brew upgrade devplaninc/devplan/devplan
+        brew upgrade devplan
 
       The CLI's internal updater is not available for Homebrew installations.
       This ensures compatibility with Homebrew's package management system.
 
-      For more information, visit: https://github.com/devplaninc/devplan-cli
+      For more information about Devplan, visit: https://devplan.com
     EOS
   end
 
