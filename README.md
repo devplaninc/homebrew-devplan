@@ -61,20 +61,7 @@ The formula is updated automatically when new versions of devplan are released. 
 - SHA256 checksum updates
 
 ## Manual update:
-   ```bash
-   # Download the binaries
-   curl -L -o devplan-darwin-amd64 "https://github.com/devplaninc/devplan/releases/download/v1.0.0/devplan-darwin-amd64"
-   curl -L -o devplan-darwin-arm64 "https://github.com/devplaninc/devplan/releases/download/v1.0.0/devplan-darwin-arm64"
-   
-   # Calculate SHA256 checksums
-   sha256sum devplan-darwin-amd64
-   sha256sum devplan-darwin-arm64
-   
-   # Update devplan.rb with the version and checksums
-   # Replace "1.0.0" with actual version
-   # Replace "PLACEHOLDER_AMD64_SHA256" with actual AMD64 checksum
-   # Replace "PLACEHOLDER_ARM64_SHA256" with actual ARM64 checksum
-   ```
+Update version and 2 SHA values in the `devplan.rb`
 
 ### Testing the Formula
 

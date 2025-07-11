@@ -120,7 +120,7 @@ jobs:
         echo "  ARM64 SHA256: $ARM64_SHA256"
         
         # Backup original formula
-        cp devplan.template.rb devplan.new.rb
+        cp _devplan.template.rb_ devplan.new.rb
         
         # Update the formula file
         sed -i "s/__VERSION__/$VERSION/" devplan.new.rb
