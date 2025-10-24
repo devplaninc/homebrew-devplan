@@ -1,18 +1,18 @@
 class Devplan < Formula
   desc "AI-powered development planning and task management CLI"
   homepage "https://github.com/devplaninc/devplan-cli"
-  version "0.40.0"
+  version "0.41.0"
   license "MIT"
 
   on_macos do
     on_arm do
       url "https://github.com/devplaninc/devplan-cli/releases/download/v#{version}/devplan-darwin-arm64-noautoupdate.tar.gz"
-      sha256 "198e8e350d9df60772792684592d313cd3f147d2666d67c6796aa8f1d3380e10"
+      sha256 "646cf2cc35b19024d910f282164f935b6a2e8bcfd2bf1192763500c8947054c6"
     end
 
     on_intel do
       url "https://github.com/devplaninc/devplan-cli/releases/download/v#{version}/devplan-darwin-amd64-noautoupdate.tar.gz"
-      sha256 "736ac9bacbd95138b090ffb7be64ad7cbe4874acbad689c277ee1cb04b47adfb"
+      sha256 "2fca0e0520d412a2667e75e02bf3cc8f204b55602dabf7cc5fadeab0a55a838b"
     end
   end
 
