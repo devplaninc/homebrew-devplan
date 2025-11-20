@@ -1,3 +1,4 @@
 **/devplan_current_feature*.md*
 !.windsurf/rules/devplan_*.md
 !.windsurf/rules/devplan_current_feature*.md
+/.idea/

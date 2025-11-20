@@ -17,7 +17,17 @@ class Devplan < Formula
   end
 
   def install
-    bin.install Dir["devplan-*"].first => "devplan"
+    # Install the CLI binary into libexec (not on PATH)
+    libexec.install Dir["devplan-*"].first => "devplan-cli"
+
+    # Modify the wrapper script to point to the correct binary location
+      inreplace "devplan.sh", 'BINARY_RELATIVE_DIR=""', 'BINARY_RELATIVE_DIR="../libexec/"'
+
+      # Install bash wrapper
+      bin.install "devplan.sh" => "devplan"
+
+    # Ensure wrapper can find the CLI
+    (bin/"devplan").chmod 0755
   end
 
   def caveats
