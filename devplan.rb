@@ -16,6 +16,18 @@ class Devplan < Formula
     end
   end
 
+  on_linux do
+    on_arm do
+      url "https://github.com/devplaninc/devplan-cli/releases/download/v#{version}/devplan-linux-arm64-noautoupdate.tar.gz"
+      sha256 "915bab928582f7a1ee94b3ab6e9014e7043dd32770e0f67aa89dff92101c58e1"
+    end
+
+    on_intel do
+      url "https://github.com/devplaninc/devplan-cli/releases/download/v#{version}/devplan-linux-amd64-noautoupdate.tar.gz"
+      sha256 "24250009acf27bba163dc8d5c8430b6a5b6e40f62058cc1ec21f0da1286212eb"
+    end
+  end
+
   def install
     # Install the CLI binary into libexec (not on PATH)
     libexec.install Dir["devplan-*"].first => "devplan-cli"
