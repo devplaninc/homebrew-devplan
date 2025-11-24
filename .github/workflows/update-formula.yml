@@ -46,6 +46,8 @@ jobs:
         # Extract download URLs for binaries
         AMD64_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name == "devplan-darwin-amd64-noautoupdate.tar.gz") | .browser_download_url')
         ARM64_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name == "devplan-darwin-arm64-noautoupdate.tar.gz") | .browser_download_url')
+        LINUX_AMD64_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name == "devplan-linux-amd64-noautoupdate.tar.gz") | .browser_download_url')
+        LINUX_ARM64_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name == "devplan-linux-arm64-noautoupdate.tar.gz") | .browser_download_url')
         
         # Validate that both binaries exist
         if [[ "$AMD64_URL" == "null" || -z "$AMD64_URL" ]]; then
@@ -60,9 +62,23 @@ jobs:
           exit 1
         fi
         
+        if [[ "$LINUX_AMD64_URL" == "null" || -z "$LINUX_AMD64_URL" ]]; then
+          echo "Error: linux AMD64 binary not found in release v${VERSION}"
+          echo "Expected asset name: devplan-linux-amd64-noautoupdate.tar.gz"
+          exit 1
+        fi
+        
+        if [[ "$LINUX_ARM64_URL" == "null" || -z "$LINUX_ARM64_URL" ]]; then
+          echo "Error: linux ARM64 binary not found in release v${VERSION}"
+          echo "Expected asset name: devplan-linux-arm64-noautoupdate.tar.gz"
+          exit 1
+        fi
+        
         echo "Found binaries:"
         echo "  AMD64: $AMD64_URL"
         echo "  ARM64: $ARM64_URL"
+        echo "  LINUX_AMD64: $LINUX_AMD64_URL"
+        echo "  LINUX_ARM64: $LINUX_ARM64_URL"
         
         # Download binaries to calculate SHA256
         echo "Downloading AMD64 binary..."
@@ -75,6 +91,19 @@ jobs:
         if ! curl -L -f -o devplan-darwin-arm64-noautoupdate.tar.gz "$ARM64_URL"; then
           echo "Error: Failed to download ARM64 binary"
           rm -f devplan-darwin-amd64
+          exit 1
+        fi
+        
+        echo "Downloading linux AMD64 binary..."
+        if ! curl -L -f -o devplan-linux-amd64-noautoupdate.tar.gz "$LINUX_AMD64_URL"; then
+          echo "Error: Failed to download linux AMD64 binary"
+          exit 1
+        fi
+        
+        echo "Downloading linux ARM64 binary..."
+        if ! curl -L -f -o devplan-linux-arm64-noautoupdate.tar.gz "$LINUX_ARM64_URL"; then
+          echo "Error: Failed to download linux ARM64 binary"
+          rm -f devplan-linux-amd64
           exit 1
         fi
         
@@ -91,21 +120,40 @@ jobs:
           exit 1
         fi
         
+        if [[ ! -s devplan-linux-amd64-noautoupdate.tar.gz ]]; then
+          echo "Error: linux AMD64 binary is empty"
+          rm -f devplan-linux-*
+          exit 1
+        fi
+        
+        if [[ ! -s devplan-linux-arm64-noautoupdate.tar.gz ]]; then
+          echo "Error: linux ARM64 binary is empty"
+          rm -f devplan-linux-*
+          exit 1
+        fi
+        
         # Calculate SHA256 checksums
         echo "Calculating checksums..."
         AMD64_SHA256=$(sha256sum devplan-darwin-amd64-noautoupdate.tar.gz | cut -d' ' -f1)
         ARM64_SHA256=$(sha256sum devplan-darwin-arm64-noautoupdate.tar.gz | cut -d' ' -f1)
+        LINUX_AMD64_SHA256=$(sha256sum devplan-linux-amd64-noautoupdate.tar.gz | cut -d' ' -f1)
+        LINUX_ARM64_SHA256=$(sha256sum devplan-linux-arm64-noautoupdate.tar.gz | cut -d' ' -f1)
         
         echo "Checksums:"
         echo "  AMD64: $AMD64_SHA256"
         echo "  ARM64: $ARM64_SHA256"
+        echo "  LINUX_AMD64: $LINUX_AMD64_SHA256"
+        echo "  LINUX_ARM64: $LINUX_ARM64_SHA256"
         
         # Clean up downloaded files
         rm devplan-darwin-amd64-noautoupdate.tar.gz devplan-darwin-arm64-noautoupdate.tar.gz
+        rm devplan-linux-amd64-noautoupdate.tar.gz devplan-linux-arm64-noautoupdate.tar.gz
         
         # Set outputs
         echo "amd64_sha256=$AMD64_SHA256" >> $GITHUB_OUTPUT
         echo "arm64_sha256=$ARM64_SHA256" >> $GITHUB_OUTPUT
+        echo "linux_amd64_sha256=$LINUX_AMD64_SHA256" >> $GITHUB_OUTPUT
+        echo "linux_arm64_sha256=$LINUX_ARM64_SHA256" >> $GITHUB_OUTPUT
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         
     - name: Update formula
@@ -113,11 +161,15 @@ jobs:
         VERSION="${{ steps.fetch-assets.outputs.version }}"
         AMD64_SHA256="${{ steps.fetch-assets.outputs.amd64_sha256 }}"
         ARM64_SHA256="${{ steps.fetch-assets.outputs.arm64_sha256 }}"
+        LINUX_AMD64_SHA256="${{ steps.fetch-assets.outputs.linux_amd64_sha256 }}"
+        LINUX_ARM64_SHA256="${{ steps.fetch-assets.outputs.linux_arm64_sha256 }}"
         
         echo "Updating formula with:"
         echo "  Version: $VERSION"
         echo "  AMD64 SHA256: $AMD64_SHA256"
         echo "  ARM64 SHA256: $ARM64_SHA256"
+        echo "  LINUX_AMD64 SHA256: $LINUX_AMD64_SHA256"
+        echo "  LINUX_ARM64 SHA256: $LINUX_ARM64_SHA256"
         
         # Backup original formula
         cp _devplan.template.rb_ devplan.new.rb
@@ -126,6 +178,8 @@ jobs:
         sed -i "s/__VERSION__/$VERSION/" devplan.new.rb
         sed -i "s/__AMD64_SHA256__/$AMD64_SHA256/" devplan.new.rb
         sed -i "s/__ARM64_SHA256__/$ARM64_SHA256/" devplan.new.rb
+        sed -i "s/__LINUX_AMD64_SHA256__/$LINUX_AMD64_SHA256/" devplan.new.rb
+        sed -i "s/__LINUX_ARM64_SHA256__/$LINUX_ARM64_SHA256/" devplan.new.rb
         
         # Verify changes were made
         if ! grep -q "version \"$VERSION\"" devplan.new.rb; then
@@ -142,6 +196,18 @@ jobs:
         
         if ! grep -q "$ARM64_SHA256" devplan.new.rb; then
           echo "Error: Failed to update ARM64 SHA256 in formula"
+          cat devplan.new.rb
+          exit 1
+        fi
+        
+        if ! grep -q "$LINUX_AMD64_SHA256" devplan.new.rb; then
+          echo "Error: Failed to update LINUX_AMD64 SHA256 in formula"
+          cat devplan.new.rb 
+          exit 1
+        fi
+        
+        if ! grep -q "$LINUX_ARM64_SHA256" devplan.new.rb; then
+          echo "Error: Failed to update LINUX_ARM64 SHA256 in formula"
           cat devplan.new.rb
           exit 1
         fi
@@ -167,8 +233,6 @@ jobs:
 
         Updated formula with:
           - Version: ${{ steps.fetch-assets.outputs.version }}
-          - AMD64 SHA256: ${{ steps.fetch-assets.outputs.amd64_sha256 }}
-          - ARM64 SHA256: ${{ steps.fetch-assets.outputs.arm64_sha256 }}"
 
         
         # Push changes
