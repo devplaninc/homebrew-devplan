@@ -233,6 +233,7 @@ jobs:
 
         Updated formula with:
           - Version: ${{ steps.fetch-assets.outputs.version }}
+        "
 
         
         # Push changes
