@@ -1,30 +1,30 @@
 class Devplan < Formula
   desc "AI-powered development planning and task management CLI"
   homepage "https://github.com/devplaninc/devplan-cli"
-  version "0.71.0"
+  version "0.72.0"
   license "MIT"
 
   on_macos do
     on_arm do
       url "https://github.com/devplaninc/devplan-cli/releases/download/v#{version}/devplan-darwin-arm64-noautoupdate.tar.gz"
-      sha256 "7b72c3b8fe2899f739fcf9cda56564860f39dd506edb22c42f71ec8e6a5fb3bb"
+      sha256 "2fbff45e74b3b023044f3df4adc4978d44c44eca9350fc927e0c3447798ffd89"
     end
 
     on_intel do
       url "https://github.com/devplaninc/devplan-cli/releases/download/v#{version}/devplan-darwin-amd64-noautoupdate.tar.gz"
-      sha256 "a8e140a4c6adb4cbc989f2e5897b8f0d60a8ff20f340359f3541f74ba45e6224"
+      sha256 "c1f31f3d7b368add6ca30ad5f19c9393f66fc09ccbfbc09884ad80b0d550c617"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/devplaninc/devplan-cli/releases/download/v#{version}/devplan-linux-arm64-noautoupdate.tar.gz"
-      sha256 "3363e0597e92fa92f5528e238b684dae77641aec99c9c67394db36740c65e9bf"
+      sha256 "2a81f2ca87fc937149938f6c32ec69cfe6b8379936f236f18e6cb1eff0111d3a"
     end
 
     on_intel do
       url "https://github.com/devplaninc/devplan-cli/releases/download/v#{version}/devplan-linux-amd64-noautoupdate.tar.gz"
-      sha256 "85016327d88f672134f8bcd635cf25db85d2ff123dedbdc65fecc07271754c4b"
+      sha256 "ccb1126b6452046ede542b037e09cfbb504d2c541b34112ca8fb76dcf4f78b80"
     end
   end
 
